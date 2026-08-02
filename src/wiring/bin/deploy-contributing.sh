@@ -2,8 +2,8 @@
 
 # ---
 # description: >-
-#   Renders CONTRIBUTING.md from templates/contributing/base.md using
-#   project.name (and related fields) from .mtdt.yaml
+#   Drops a static CONTRIBUTING.md template; substitutes {{name}} from
+#   project.name in .mtdt.yaml (no contributing fields in the schema)
 # ---
 
 # ---

@@ -2,7 +2,7 @@
 
 # ---
 # description: >-
-#   Renders license.txt (or project.license.file) from .mtdt.yaml and the
+#   Renders LICENSE (or project.license.file) from .mtdt.yaml and the
 #   matching template under templates/license/
 # ---
 
@@ -10,6 +10,9 @@
 
 set -o errexit
 set -o nounset
+
+# Default output name when project.license.file is unset (GitHub/SPDX convention).
+DEFAULT_LICENSE_FILE="LICENSE"
 
 script="$(realpath "${0}")"
 script_dir="$(dirname "${script}")"
@@ -76,9 +79,9 @@ find "${@}" -type f -iname ".mtdt.yaml" |
 
         year="$(format_year "${file}")"
         owners="$(format_owners "${file}")"
-        out_rel="$(yq -r '.project.license.file // "license.txt"' "${file}")"
+        out_rel="$(yq -r ".project.license.file // \"${DEFAULT_LICENSE_FILE}\"" "${file}")"
         if [ -z "${out_rel}" ] || [ "${out_rel}" = "null" ]; then
-            out_rel="license.txt"
+            out_rel="${DEFAULT_LICENSE_FILE}"
         fi
         out="${repo_dir}/${out_rel}"
 

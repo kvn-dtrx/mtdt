@@ -2,8 +2,8 @@
 
 ## Purpose
 
-This file is generated from `.mtdt.yaml` via mtdt-project. Adjust locally if
-the project needs a different contribution workflow.
+Boilerplate contribution notes. Edit freely if the project needs a different
+workflow.
 
 ## How to contribute
 
@@ -14,4 +14,4 @@ the project needs a different contribution workflow.
 ## License
 
 Unless stated otherwise, contributions are accepted under the project's
-declared license (see `license.txt` / `.mtdt.yaml`).
+declared license (see `LICENSE`).

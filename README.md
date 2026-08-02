@@ -3,34 +3,46 @@
 ## Synopsis
 
 Specification and deployment tooling for `.mtdt.yaml` — per-repository
-metadata used to sync forge settings and to materialise files such as
-`license.txt` / `CONTRIBUTING.md`.
+metadata used to sync forge settings and to materialise `LICENSE` from
+`project.license`. A separate helper can drop a static `CONTRIBUTING.md`
+template (only `project.name` is substituted — there is no contributing
+schema in `.mtdt.yaml`).
 
 This repository does **not** embed shared config snippets (that is dia).
 
 ## Layout
 
 ```
-docs/spec.md           schema and purpose
-scripts/               deployers and GitHub sync helpers
-templates/license/     license text templates
-templates/contributing/ contributing templates
+docs/spec.md              schema and purpose
+src/wiring/bin/           installable CLIs (source of truth)
+bin/make-install.bash     symlink wiring into MY_LOCAL_HOME/bin
+templates/license/        license text templates
+templates/contributing/   contributing templates
 ```
+
+## Install
+
+```bash
+make install   # or: bin/make-install.bash
+```
+
+Uses `${MY_LOCAL_HOME:-$HOME/.local}/bin` and strips the file extension from
+each wiring script name (e.g. `deploy-license.sh` → `deploy-license`).
 
 ## Scripts
 
 | Script | Role |
 |--------|------|
-| `update-gh-repo-descriptions.sh` | Push `project.description` via `gh repo edit` |
-| `update-gh-repo-visibility.sh` | Push `project.github.visibility` |
-| `update-gh-repo-names.sh` | Prompt when local directory name ≠ GitHub name |
-| `deploy-license.sh` | Render `license.txt` from `project.license` |
-| `deploy-contributing.sh` | Render `CONTRIBUTING.md` from template + mtdt |
-| `validate-mtdt.sh` | Basic structural checks on `.mtdt.yaml` |
-| `init-mtdt.sh` | Scaffold a new `.mtdt.yaml` with a fresh UUID |
+| `update-gh-repo-descriptions` | Push `project.description` via `gh repo edit` |
+| `update-gh-repo-visibility` | Push `project.github.visibility` |
+| `update-gh-repo-names` | Prompt when local directory name ≠ GitHub name |
+| `deploy-license` | Render `LICENSE` (or `project.license.file`) from `project.license` |
+| `deploy-contributing` | Copy static `CONTRIBUTING.md` template; fill `{{name}}` from `project.name` only |
+| `validate-mtdt` | Basic structural checks on `.mtdt.yaml` |
+| `init-mtdt` | Scaffold a new `.mtdt.yaml` with a fresh UUID |
 
 All directory-walking scripts accept one or more roots (default: `.`).
-`init-mtdt.sh` takes an optional target directory (default: `.`).
+`init-mtdt` takes an optional target directory (default: `.`).
 
 ### Further ideas (not implemented)
 

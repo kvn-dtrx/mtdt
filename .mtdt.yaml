@@ -1,0 +1,14 @@
+project:
+  id: dc094867-e1f7-4f45-8d89-5eab2f577d01
+  name: Mtdt
+  description: >-
+    Specification and deployment tooling for .mtdt.yaml project metadata files
+  authors:
+    - name: Kvn Dtrx
+      mail: kvn.dtrx+git@protonmail.ch
+  license:
+    type: MIT
+    year: 2026
+  github:
+    url: https://github.com/kvn-dtrx/mtdt
+    visibility: public

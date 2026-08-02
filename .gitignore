@@ -1,0 +1,35 @@
+# Base
+
+# macOS
+._*
+.AppleDouble
+.DS_Store
+.LSOverride
+.Spotlight-V100
+.Trashes
+*~
+
+# Linux
+.nfs*
+
+# Windows
+$RECYCLE.BIN/
+Desktop.ini
+Thumbs.db
+
+# Logs and temporary files
+*.bak
+*.bkp
+*.log
+*.swo
+*.swp
+*.tmp
+log/
+logs/
+tmp/
+
+# Local environment variables
+.env
+.env.*
+!.env.example
+!.env.default

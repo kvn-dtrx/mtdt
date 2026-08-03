@@ -57,9 +57,9 @@ while IFS="" read -r file; do
                 esac
                 ;;
             !!seq)
-                # non-empty sequence of numbers
+                # non-empty sequence of integers (use tag; yq mishandles == ["!!int"])
                 if [ "$(yq -r '.project.license.year | length' "${file}")" -gt 0 ] &&
-                    [ "$(yq -r '[.project.license.year[] | type] | unique | . == ["!!int"]' "${file}")" = "true" ]; then
+                    [ "$(yq -r '.project.license.year | map(tag == "!!int") | all' "${file}")" = "true" ]; then
                     year_ok=1
                 fi
                 ;;
@@ -71,18 +71,33 @@ while IFS="" read -r file; do
         fi
     fi
 
-    visibility="$(yq -r '.project.github.visibility // ""' "${file}")"
-    case "${visibility}" in
-        "" | null | public | private | internal) ;;
-        *)
-            printf '%s\n' "ERROR ${file}: invalid github.visibility '${visibility}'" >&2
-            errors=$((errors + 1))
-            ;;
-    esac
-
-    if yq -e '.project.subtrees' "${file}" > /dev/null 2>&1; then
-        printf '%s\n' "ERROR ${file}: subtrees must be top-level, not under project:" >&2
+    if yq -e '.project.github' "${file}" > /dev/null 2>&1; then
+        printf '%s\n' "ERROR ${file}: github must be under forges:, not project:" >&2
         errors=$((errors + 1))
+    fi
+
+    if yq -e '.subtrees' "${file}" > /dev/null 2>&1; then
+        printf '%s\n' "ERROR ${file}: subtrees is not part of the schema" >&2
+        errors=$((errors + 1))
+    fi
+
+    # Validate visibility on every forge host entry that declares one
+    host_count="$(yq -r '.forges // {} | keys | length' "${file}" 2> /dev/null || printf '0')"
+    if [ "${host_count}" != "0" ] && [ "${host_count}" != "null" ]; then
+        idx=0
+        while [ "${idx}" -lt "${host_count}" ]; do
+            host="$(yq -r ".forges | keys | .[${idx}]" "${file}")"
+            visibility="$(yq -r ".forges.${host}.visibility // \"\"" "${file}")"
+            case "${visibility}" in
+                "" | null | public | private | internal) ;;
+                *)
+                    printf '%s\n' \
+                        "ERROR ${file}: invalid forges.${host}.visibility '${visibility}'" >&2
+                    errors=$((errors + 1))
+                    ;;
+            esac
+            idx=$((idx + 1))
+        done
     fi
 done < "${tmp}"
 

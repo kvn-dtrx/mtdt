@@ -1,84 +1,98 @@
 # ---
-title: .mtdt.yaml
+title: .mtdt.yaml specification
 category: MINT
 created: 2025-08-31
-updated: 2026-08-02
+updated: 2026-08-04
 ---
 
 ---
 
 ## Purpose
 
-`.mtdt.yaml` is a per-repository metadata descriptor. It is the source of truth
-for project identity (name, description, authors), licensing, and forge
-settings (GitHub/GitLab). Tools in this repository read it to deploy files
-(e.g. `LICENSE`) and to sync remote repository settings.
+`.mtdt.yaml` is the per-repository metadata descriptor and source of truth for
+project identity, licensing, and forge settings. Tools in this repository
+deploy files (e.g. `LICENSE`) and sync remote forge settings from it.
 
-It is intentionally separate from snippet embedding (dia): consumers who only
-want metadata deployment need not adopt marker-based resource pulls.
+It is intentionally separate from snippet embedding (dia).
 
-## Schema
+Companion files:
 
-Key order under `project:` is fixed:
+| File | Role |
+|------|------|
+| [`example.mtdt.yaml`](example.mtdt.yaml) | Commented illustration of a filled file |
+| [`../templates/mtdt.yaml`](../templates/mtdt.yaml) | Blank scaffold (`init-mtdt`; copy by hand) |
 
-`id` → `name` → `description` → `authors` → `license` → `github`
+## Document shape
 
-```yaml
-project:
-  # Unique project identifier (UUID)
-  id: "<PROJECT_ID>"
-  # Human-readable project name
-  name: "<PROJECT_NAME>"
-  # Brief description; prefer YAML folded style >-
-  description: >-
-    <SHORT_DESCRIPTION>
-  authors:
-    - name: "<AUTHOR_NAME>"
-      mail: "<EMAIL_OR_NULL>"
-      # Optional: maintainer, contributor, …
-      role: "<ROLE_OR_NULL>"
-  # null if the project has no declared license
-  license: null
-  # or:
-  # license:
-  #   type: MIT            # e.g. MIT, Apache-2.0, ISC
-  #   year: 2025           # int
-  #   # year: 2022-2024    # inclusive interval (string)
-  #   # year: [2001, 2042] # discrete years (list)
-  #   # copyright-owner:   # optional override; default = author names
-  #   # file: LICENSE      # optional output path; default LICENSE
-  github:
-    url: "<GITHUB_URL_OR_NULL>"
-    visibility: "<public|private|internal|null>"
-  # Optional forge / discovery fields (not required by current scripts):
-  # gitlab:
-  #   url: "<GITLAB_URL>"
-  #   visibility: "<public|private|internal>"
-  # homepage: "<HOMEPAGE_URL>"
-  # tags: ["latex", "template"]
-  # version: "0.1.0"
+Exactly two required top-level keys, in this order:
 
-# Only when the repository uses git subtrees — stays a sibling of project:,
-# never folded into project:
-subtrees:
-  - path: docs
-    remote: docs
-    branch: main
-    description: >-
-      Documentation subtree
-    github: git@github.com:example/docs.git
-```
+1. `project` — identity and license of the work
+2. `forges` — hosting platforms and their repo settings
 
-## Conventions
+No other top-level keys are defined. Unknown keys should be rejected by
+validators once tooling covers them; today `validate-mtdt` only flags
+legacy `project.github` and `subtrees`.
 
-- Description: sentence case, no trailing full stop; YAML scalar `>-`.
-- `license: null` means “no license deployment”; omit forge sync side effects
-  that depend on license content.
-- Year forms: single integer, interval string `START-END`, or list of integers.
-- `subtrees` is top-level beside `project`, never inside it.
+## `project`
+
+Fixed key order:
+
+`id` → `name` → `description` → `authors` → `license`
+
+| Key | Type | Rules |
+|-----|------|--------|
+| `id` | string (UUID) | Required; stable unique id |
+| `name` | string | Required; human-readable project name |
+| `description` | string \| null | Prefer folded scalar `>-`; sentence case; no trailing full stop |
+| `authors` | list of maps | Required; non-empty. Each entry: `name` (required), `mail`, optional `role` |
+| `license` | null \| map | `null` = no license deployment |
+
+### `project.license` (when not null)
+
+| Key | Type | Rules |
+|-----|------|--------|
+| `type` | string | SPDX-ish id used to select `templates/license/*` (e.g. `MIT`, `Apache-2.0`, `ISC`) |
+| `year` | int \| string \| list of int | See year forms below |
+| `copyright-owner` | string \| list | Optional; default = author names joined |
+| `file` | string | Optional output path; default `LICENSE` |
+
+Year forms:
+
+- single integer — `2026`
+- inclusive interval string — `2022-2024`
+- discrete list — `[2025, 2026]`
+
+## `forges`
+
+Map keyed by lowercase host id (`github`, `gitlab`, …). Hosts are optional
+individually; omit a host if unused. Entry field order: `url` → `visibility`.
+
+| Key | Type | Rules |
+|-----|------|--------|
+| `url` | string \| null | Canonical repo URL on that host |
+| `visibility` | `public` \| `private` \| `internal` \| null | Forge visibility; `null` skips sync |
+
+Current sync scripts read `forges.github` only (`gh`). Additional hosts are
+schema-valid for declaration; tooling may ignore them until implemented.
+
+## Relation to `pyproject.toml`
+
+When both files exist, `.mtdt.yaml` remains authoritative for identity.
+`flush-pyproject` patches an *existing* `pyproject.toml` only:
+
+- `project.description`
+- `project.authors` (`mail` → `email`)
+- `project.license` as `{ file = … }` when `license.file` is set, or when
+  pyproject has no license yet (default `LICENSE`)
+- `project.urls.Source` from `forges.github.url`
+
+It does not create `pyproject.toml`, and does not touch distribution `name`,
+`version`, dependencies, or `[tool.*]`.
 
 ## Non-goals
 
-- Snippet libraries and marker embedding (see dia / dia-resources).
-- Local projects tree / editor workspaces (see meta-project).
-- Git hook installation (separate concern).
+- Snippet libraries and marker embedding
+- Local projects tree / editor workspaces
+- Git hook installation
+- Owning packaging metadata (version, deps, entry points)
+- Git subtree / local remote orchestration

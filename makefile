@@ -1,10 +1,15 @@
 # ---
-# title: Makefile for mtdt-project
+# title: Makefile for mtdt
 # ---
 
+# Make targets follow paradigmata (install = deploy; ops in justfile).
+
 # ---
+
+XDG_DATA_HOME ?= $(HOME)/.local/share
+WIRE := $(XDG_DATA_HOME)/dia/resources/wire/make-wire.bash
 
 .PHONY: install
 
 install: ## Symlink wiring scripts into MY_LOCAL_HOME/bin
-	@bin/make-install.bash
+	@bash "$(WIRE)" libexec "$(CURDIR)"

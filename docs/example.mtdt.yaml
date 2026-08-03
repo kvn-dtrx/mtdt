@@ -1,0 +1,50 @@
+# ---
+# title: Example .mtdt.yaml
+# ---
+
+# Copy-paste scaffold: ../templates/mtdt.yaml
+# Normative rules: ./spec.md
+
+# ---
+
+project:
+  # Stable unique id (UUID); do not recycle across repos
+  id: 01234567-89ab-cdef-0123-456789abcdef
+
+  # Human-readable project name (not necessarily the directory or forge slug)
+  name: Example Project
+
+  # Sentence case, no trailing full stop. Prefer folded style >-
+  description: >-
+    Short description of what the project does
+
+  authors:
+    - name: Ada Example
+      mail: ada@example.com
+      # Optional: maintainer, contributor, …
+      role: maintainer
+    - name: Bea Example
+      mail: null
+
+  # null → tools skip license deployment
+  # license: null
+  license:
+    type: MIT
+    # int | "YYYY-YYYY" | [YYYY, …]
+    year: 2026
+    # year: 2022-2024
+    # year: [2025, 2026]
+    # Optional override; default = author names
+    # copyright-owner: Example Contributors
+    # Optional output path; default LICENSE
+    # file: LICENSE
+
+forges:
+  github:
+    url: https://github.com/example/example-project
+    # public | private | internal | null (null → skip visibility sync)
+    visibility: public
+  # Declare further hosts as needed; sync tooling may not cover them yet
+  # gitlab:
+  #   url: https://gitlab.com/example/example-project
+  #   visibility: private

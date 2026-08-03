@@ -1,0 +1,19 @@
+project:
+  id: "{{ id }}"
+  name: "{{ name }}"
+  description: >-
+    {{ description }}
+  authors:
+    - name: "{{ author_name }}"
+      mail: "{{ author_mail }}"
+      role: "{{ author_role }}"
+    - name: "{{ author_name_2 }}"
+      mail: null
+  license:
+    type: "{{ license_type }}"
+    year: "{{ license_year }}"
+
+forges:
+  github:
+    url: "{{ github_url }}"
+    visibility: "{{ github_visibility }}"

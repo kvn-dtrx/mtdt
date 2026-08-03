@@ -13,9 +13,10 @@ This repository does **not** embed shared config snippets (that is dia).
 ## Layout
 
 ```
-docs/spec.md              schema and purpose
-src/wiring/bin/           installable CLIs (source of truth)
-bin/make-install.bash     symlink wiring into MY_LOCAL_HOME/bin
+docs/spec.md              normative schema
+docs/example.mtdt.yaml    commented filled example
+src/wire/bin/             installable CLIs (source of truth)
+templates/mtdt.yaml       blank .mtdt.yaml scaffold (init-mtdt)
 templates/license/        license text templates
 templates/contributing/   contributing templates
 ```
@@ -34,12 +35,13 @@ each wiring script name (e.g. `deploy-license.sh` → `deploy-license`).
 | Script | Role |
 |--------|------|
 | `update-gh-repo-descriptions` | Push `project.description` via `gh repo edit` |
-| `update-gh-repo-visibility` | Push `project.github.visibility` |
+| `update-gh-repo-visibility` | Push `forges.github.visibility` |
 | `update-gh-repo-names` | Prompt when local directory name ≠ GitHub name |
 | `deploy-license` | Render `LICENSE` (or `project.license.file`) from `project.license` |
 | `deploy-contributing` | Copy static `CONTRIBUTING.md` template; fill `{{name}}` from `project.name` only |
+| `flush-pyproject` | Patch existing `pyproject.toml` with overlapping identity fields (skip if absent) |
 | `validate-mtdt` | Basic structural checks on `.mtdt.yaml` |
-| `init-mtdt` | Scaffold a new `.mtdt.yaml` with a fresh UUID |
+| `init-mtdt` | Scaffold `.mtdt.yaml` from `templates/mtdt.yaml` (fresh UUID) |
 
 All directory-walking scripts accept one or more roots (default: `.`).
 `init-mtdt` takes an optional target directory (default: `.`).
@@ -55,6 +57,7 @@ All directory-walking scripts accept one or more roots (default: `.`).
 - `yq` (YAML queries)
 - `gh` (GitHub CLI) for the `update-gh-*` scripts
 - POSIX `sh`
+- Python ≥3.11 with `PyYAML` and `tomlkit` (for `flush-pyproject` only)
 
 ## Origin notes
 

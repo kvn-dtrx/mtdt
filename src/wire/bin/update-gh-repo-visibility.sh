@@ -14,7 +14,7 @@ find "${@}" -type f -iname ".mtdt.yaml" |
     while IFS="" read -r file; do
         repo_dir="$(dirname "${file}")"
         if [ -d "${repo_dir}/.git" ]; then
-            visibility="$(yq -r ".project.github.visibility" "${file}" 2> /dev/null)"
+            visibility="$(yq -r ".forges.github.visibility" "${file}" 2> /dev/null)"
             case "${visibility}" in
                 public | private | internal) ;;
                 "" | null) continue ;;

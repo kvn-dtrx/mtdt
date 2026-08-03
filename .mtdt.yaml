@@ -9,6 +9,7 @@ project:
   license:
     type: MIT
     year: 2026
+forges:
   github:
     url: https://github.com/kvn-dtrx/mtdt
     visibility: public

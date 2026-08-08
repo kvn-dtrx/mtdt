@@ -1,5 +1,7 @@
 #!/usr/bin/env -S awk -f
+
 # dia:begin scripts/_ls-make-targets.awk
+
 # ---
 # description: >-
 #   Lists all make targets with description; more precisely, all lines
@@ -33,4 +35,6 @@ END {
         printf "%-*s: %s\n", max, targets[i], desc[i]
     }
 }
+
 # dia:end
+

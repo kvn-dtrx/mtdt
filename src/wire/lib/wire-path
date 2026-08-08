@@ -1,0 +1,30 @@
+# ---
+# description: >-
+#   Source from a public wire script. Prepends this package's flat libexec
+#   dir to PATH for the current process (helpers stay off the login PATH).
+#   Prefer WIRE_LIBEXEC from install stub / direnv; fall back to layout guess.
+#   Lives under lib/ (sourced).
+# ---
+
+# ---
+
+if [ -n "${WIRE_LIBEXEC:-}" ]; then
+    _wp_lib="${WIRE_LIBEXEC}"
+else
+    _here="$(CDPATH= cd -- "$(dirname "$(realpath "$0")")" && pwd)"
+    case "${_here}" in
+        */src/wire/bin | */src/wire/sbin | */src/wire/lib)
+            _wp_lib="$(CDPATH= cd -- "${_here}/../libexec" && pwd)" ||
+                _wp_lib="${MY_LOCAL_HOME:-${HOME}/.local}/libexec/mtdt"
+            ;;
+        *)
+            _wp_lib="${MY_LOCAL_HOME:-${HOME}/.local}/libexec/mtdt"
+            ;;
+    esac
+    unset _here
+fi
+case ":${PATH}:" in
+    *":${_wp_lib}:"*) ;;
+    *) PATH="${_wp_lib}:${PATH}"; export PATH ;;
+esac
+unset _wp_lib

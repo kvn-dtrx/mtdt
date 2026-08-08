@@ -1,4 +1,5 @@
 # dia:begin gitignore/base.ignore
+
 # Base
 
 # macOS
@@ -43,12 +44,15 @@ tmp/
 .envrc
 .envrc.*
 !.envrc.example
+!.envrc
+
 # dia:end
 
 # Keep tracked defaults (base ignores .env.*)
 !.env.default
 
 # dia:begin gitignore/python.ignore
+
 # Python
 
 __pycache__/
@@ -58,4 +62,6 @@ __pycache__/
 /.python-version
 /.venv/
 local_settings.py
+
 # dia:end
+

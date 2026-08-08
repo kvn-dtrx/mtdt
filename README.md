@@ -13,13 +13,17 @@ This repository does **not** embed shared config snippets (that is dia).
 ## Layout
 
 ```
+config/wire.ini           install mounts only (no host map)
 docs/spec.md              normative schema
-docs/example.mtdt.yaml    commented filled example
+docs/example.mtdt.yaml    commented filled example (generic placeholders)
 src/wire/bin/             installable CLIs (source of truth)
 templates/mtdt.yaml       blank .mtdt.yaml scaffold (init-mtdt)
 templates/license/        license text templates
 templates/contributing/   contributing templates
 ```
+
+Host- or identity-bound data lives in each project's own `.mtdt.yaml` (authors,
+forge URLs), not in this toolkit repo beyond this project's metadata file.
 
 ## Install
 

@@ -7,9 +7,9 @@
 # ---
 
 XDG_DATA_HOME ?= $(HOME)/.local/share
-WIRE := $(XDG_DATA_HOME)/dia/resources/wire/make-wire.bash
+WIRE := $(CURDIR)/bin/make-wire.bash
 
 .PHONY: install
 
 install: ## Symlink wiring scripts into MY_LOCAL_HOME/bin
-	@bash "$(WIRE)" libexec "$(CURDIR)"
+	@bash "$(WIRE)" "$(CURDIR)"

@@ -55,6 +55,8 @@ license_type_to_template() {
         isc) printf '%s' "isc.txt" ;;
         apache | apache-2.0 | apache2) printf '%s' "apache.txt" ;;
         gpl | gpl-3.0 | gnu) printf '%s' "gnu.txt" ;;
+        wtfpl | wtfpl-2.0) printf '%s' "wtfpl.txt" ;;
+        proprietary | arr | all-rights-reserved) printf '%s' "proprietary.txt" ;;
         *)
             printf '%s\n' "No template mapping for license type: ${1}" >&2
             return 1

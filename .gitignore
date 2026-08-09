@@ -1,6 +1,12 @@
+# ---
+# title: Gitignore for Mtdt
+# ---
+
+# ---
+
 # dia:begin gitignore/base.ignore
 
-# Base
+# --- Base ---
 
 # macOS
 ._*
@@ -28,6 +34,7 @@ Thumbs.db
 
 # Logs and temporary files
 *.bak
+*.bak[0-9]*
 *.bkp
 *.log
 *.swo
@@ -44,7 +51,6 @@ tmp/
 .envrc
 .envrc.*
 !.envrc.example
-!.envrc
 
 # dia:end
 
@@ -53,7 +59,7 @@ tmp/
 
 # dia:begin gitignore/python.ignore
 
-# Python
+# --- Python ---
 
 __pycache__/
 *.egg-info/
@@ -64,4 +70,3 @@ __pycache__/
 local_settings.py
 
 # dia:end
-

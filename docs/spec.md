@@ -45,13 +45,13 @@ Fixed key order:
 | `name` | string | Required; human-readable project name |
 | `description` | string \| null | Prefer folded scalar `>-`; sentence case; no trailing full stop |
 | `authors` | list of maps | Required; non-empty. Each entry: `name` (required), `mail`, optional `role` |
-| `license` | null \| map | `null` = no license deployment |
+| `license` | null \| map | `null` = no license deployment (omit `LICENSE` file) |
 
 ### `project.license` (when not null)
 
 | Key | Type | Rules |
 |-----|------|--------|
-| `type` | string | SPDX-ish id used to select `templates/license/*` (e.g. `MIT`, `Apache-2.0`, `ISC`) |
+| `type` | string | Selects `templates/license/*`. Known: `MIT`, `ISC`, `Apache-2.0`, `GPL-3.0`, `WTFPL` (joke/public-domain-ish), `proprietary` (all-rights-reserved stub). Aliases: `ARR`, `all-rights-reserved` → proprietary |
 | `year` | int \| string \| list of int | See year forms below |
 | `copyright-owner` | string \| list | Optional; default = author names joined |
 | `file` | string | Optional output path; default `LICENSE` |

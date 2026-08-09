@@ -18,7 +18,7 @@ printf "\n"
 printf "\033[1;37m    %s\033[0m\n" "Available targets for make:"
 printf "\n"
 
-"${ls_make_targets}" makefile | sed -e "s/^/    /"
+"${ls_make_targets}" Makefile | sed -e "s/^/    /"
 
 printf "\n"
 printf "\033[1;37m    %s\033[0m\n" "Important make flags:"
@@ -30,4 +30,3 @@ printf "    %-16s: %s\n" \
     "--debug[=b|v|a]" "Debug info (b=basic [default], v=verbose, a=all)"
 
 # dia:end
-

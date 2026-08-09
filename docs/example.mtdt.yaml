@@ -26,8 +26,9 @@ project:
     - name: Bea Example
       mail: null
 
-  # null → tools skip license deployment
+  # null → tools skip license deployment (no LICENSE file)
   # license: null
+  # Joke / placeholder types: WTFPL, proprietary (all rights reserved)
   license:
     type: MIT
     # int | "YYYY-YYYY" | [YYYY, …]

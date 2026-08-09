@@ -1,0 +1,8 @@
+Copyright (c) [year] [fullname]
+
+All rights reserved.
+
+This work and associated materials are proprietary. No license is granted
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of this work without prior written permission from the copyright
+holder(s).

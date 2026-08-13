@@ -14,7 +14,7 @@ set -o nounset
 script="$(realpath "${0}")"
 script_dir="$(dirname "${script}")"
 root="$(git -C "${script_dir}" rev-parse --show-toplevel)"
-template="${root}/templates/contributing/base.md"
+template="${root}/share/templates/contributing/base.md"
 
 set -- "${@:-.}"
 

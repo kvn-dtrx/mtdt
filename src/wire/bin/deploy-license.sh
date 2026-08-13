@@ -3,7 +3,7 @@
 # ---
 # description: >-
 #   Renders LICENSE (or project.license.file) from .mtdt.yaml and the
-#   matching template under templates/license/
+#   matching template under share/templates/license/
 # ---
 
 # ---
@@ -11,13 +11,13 @@
 set -o errexit
 set -o nounset
 
-# Default output name when project.license.file is unset (GitHub/SPDX convention).
-DEFAULT_LICENSE_FILE="LICENSE"
+# Default output name when project.license.file is unset.
+DEFAULT_LICENSE_FILE="LICENSE.txt"
 
 script="$(realpath "${0}")"
 script_dir="$(dirname "${script}")"
 root="$(git -C "${script_dir}" rev-parse --show-toplevel)"
-templates="${root}/templates/license"
+templates="${root}/share/templates/license"
 
 set -- "${@:-.}"
 

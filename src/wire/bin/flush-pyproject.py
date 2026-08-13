@@ -29,7 +29,7 @@ except ImportError as exc:  # pragma: no cover
     raise SystemExit(1) from exc
 
 
-DEFAULT_LICENSE_FILE = "LICENSE"
+DEFAULT_LICENSE_FILE = "LICENSE.txt"
 
 
 def load_mtdt(path: Path) -> dict:
@@ -138,7 +138,7 @@ def flush_document(doc: tomlkit.TOMLDocument, mtdt: dict) -> list[str]:
             changed.append("project.authors")
 
     # License: only write when mtdt sets license.file, or pyproject has no license
-    # yet (then default LICENSE, matching deploy-license). Never clobber an
+    # yet (then default LICENSE.txt, matching deploy-license). Never clobber an
     # existing file= path with the default.
     lic_explicit = license_file_rel(project)
     license_meta = project.get("license")

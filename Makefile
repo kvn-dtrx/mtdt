@@ -7,9 +7,9 @@
 # ---
 
 XDG_DATA_HOME ?= $(HOME)/.local/share
-WIRE := $(CURDIR)/bin/make-wire.bash
+WIRE := $(CURDIR)/bin/make-wire.py
 
 .PHONY: install
 
 install: ## Symlink wiring scripts into MY_LOCAL_HOME/bin
-	@bash "$(WIRE)" "$(CURDIR)"
+	@python3 "$(WIRE)" "$(CURDIR)"

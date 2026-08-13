@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+# dia:file scripts/log-star
+
+# ---
+# description: >-
+#   Outputs formatted, optionally coloured log messages with a fixed-width
+#   tag to a specified sink
+# ---
+
+# ---
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+# Label width; "[XXXXX]:" consists of eight characters;
+# most common types require four to five characters
+WIDTH="8"
+# Reset directive
+RESET="\033[0m"
+# Debug level
+PRIORITY_THRESHOLD="${MY_PRIORITY_THRESHOLD:-"-1"}"
+
+OPTIND=1
+priority="0"
+colour=""
+description="UNDEF"
+sink="/dev/stderr"
+while getopts "c:d:p:s:" flag; do
+    case "${flag}" in
+        c) colour="${OPTARG}" ;;
+        d) description="${OPTARG}" ;;
+        p) priority="${OPTARG}" ;;
+        s) sink="${OPTARG}" ;;
+        *)
+            printf -- "[%s]: %s\n" \
+                "ERROR" "Unknown flag: '${flag}'" \
+                >&2
+            exit 1
+            ;;
+    esac
+done
+shift "$((OPTIND - 1))"
+
+[ "${#}" -ge 1 ] || {
+    printf -- "[%s]: %s\n" \
+        "ERROR" "At least one argument required" \
+        >&2
+    exit 1
+}
+
+[ "${priority}" -ge "${PRIORITY_THRESHOLD}" ] || {
+    exit 0
+}
+
+case "${sink}" in
+    /dev/stdout) [ -t 1 ] || { colour=""; RESET=""; } ;;
+    /dev/stderr) [ -t 2 ] || { colour=""; RESET=""; } ;;
+    *) colour=""; RESET="" ;;
+esac
+
+tag="[${description}]:"
+printf -v formatted_tag "%-${WIDTH}s" "${tag}"
+
+printf -- "%b%s%b %s\n" \
+    "${colour}" "${formatted_tag}" "${RESET}" "${1}" \
+    >> "${sink}"
+shift
+
+[ "${#}" -eq 0 ] || {
+    printf -v phantom_tag "%-${WIDTH}s" " "
+    printf -- "${phantom_tag} %s\n" "${@}" \
+        >> "${sink}"
+}

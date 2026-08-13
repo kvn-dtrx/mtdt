@@ -2,11 +2,27 @@
 
 # ---
 # description: >-
-#   Updates GitHub repo visibility from .mtdt.yaml for all repositories
-#   subordinate to the specified directories
+#   Updates GitHub repo visibility from effective mtdt forges.github.visibility
+#   (.mtdt.yaml ⊕ .mtdt.local.yaml) for all repositories under the given dirs
 # ---
 
 # ---
+
+set -o errexit
+set -o nounset
+
+script="$(realpath "${0}")"
+script_dir="$(dirname "${script}")"
+
+resolve_mtdt() {
+    if command -v resolve-mtdt > /dev/null 2>&1; then
+        resolve-mtdt "${1}"
+    elif [ -f "${script_dir}/resolve-mtdt.py" ]; then
+        python3 "${script_dir}/resolve-mtdt.py" "${1}"
+    else
+        cat "${1}"
+    fi
+}
 
 set -- "${@:-.}"
 
@@ -14,7 +30,14 @@ find "${@}" -type f -iname ".mtdt.yaml" |
     while IFS="" read -r file; do
         repo_dir="$(dirname "${file}")"
         if [ -d "${repo_dir}/.git" ]; then
-            visibility="$(yq -r ".forges.github.visibility" "${file}" 2> /dev/null)"
+            effective="$(mktemp)"
+            if ! resolve_mtdt "${file}" > "${effective}"; then
+                printf '%s\n' "resolve-mtdt failed for ${file}" >&2
+                rm -f "${effective}"
+                continue
+            fi
+            visibility="$(yq -r ".forges.github.visibility" "${effective}" 2> /dev/null)"
+            rm -f "${effective}"
             case "${visibility}" in
                 public | private | internal) ;;
                 "" | null) continue ;;

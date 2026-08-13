@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+
+# dia:file scripts/log-info
+
+# ---
+# description: >-
+#   Logs messages with an informational severity level
+# ---
+
+# ---
+
+PRIORITY="2"
+DESCRIPTION="INFO"
+COLOUR="\033[0;32m"
+command -v log-star > /dev/null 2>&1 || {
+    printf -- "[ERROR]: log-star not on PATH\n" >&2
+    exit 1
+}
+exec log-star -p "${PRIORITY}" -d "${DESCRIPTION}" -c "${COLOUR}" -- "${@}"

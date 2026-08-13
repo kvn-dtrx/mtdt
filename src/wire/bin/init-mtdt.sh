@@ -3,7 +3,7 @@
 # ---
 # description: >-
 #   Scaffolds a new .mtdt.yaml in the given directory (default: .) from
-#   templates/mtdt.yaml with a fresh UUID and the directory basename as name
+#   share/templates/mtdt.yaml with a fresh UUID and the directory basename as name
 # ---
 
 # ---
@@ -14,7 +14,7 @@ set -o nounset
 script="$(realpath "${0}")"
 script_dir="$(dirname "${script}")"
 root="$(git -C "${script_dir}" rev-parse --show-toplevel)"
-template="${root}/templates/mtdt.yaml"
+template="${root}/share/templates/mtdt.yaml"
 
 target="${1:-.}"
 out="${target}/.mtdt.yaml"

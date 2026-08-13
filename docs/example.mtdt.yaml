@@ -2,7 +2,7 @@
 # title: Example .mtdt.yaml
 # ---
 
-# Copy-paste scaffold: ../templates/mtdt.yaml
+# Copy-paste scaffold: ../share/templates/mtdt.yaml
 # Normative rules: ./spec.md
 
 # ---
@@ -11,7 +11,8 @@ project:
   # Stable unique id (UUID); do not recycle across repos
   id: 01234567-89ab-cdef-0123-456789abcdef
 
-  # Human-readable project name (not necessarily the directory or forge slug)
+  # Human-readable project name. Local directory basename should equal
+  # derive-project-slug(name); forge slug stays in forges.*.url only.
   name: Example Project
 
   # Sentence case, no trailing full stop. Prefer folded style >-
@@ -37,7 +38,7 @@ project:
     # year: [2025, 2026]
     # Optional override; default = author names
     # copyright-owner: Example Contributors
-    # Optional output path; default LICENSE
+    # Optional output path; default LICENSE.txt
     # file: LICENSE
 
 forges:

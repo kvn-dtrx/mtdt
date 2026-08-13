@@ -1,6 +1,6 @@
 #!/usr/bin/env -S awk -f
 
-# dia:begin scripts/_ls-make-targets.awk
+# dia:file scripts/_ls-make-targets.awk
 
 # ---
 # description: >-
@@ -35,5 +35,3 @@ END {
         printf "%-*s: %s\n", max, targets[i], desc[i]
     }
 }
-
-# dia:end

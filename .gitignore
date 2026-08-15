@@ -32,7 +32,7 @@ Desktop.ini
 ehthumbs.db
 Thumbs.db
 
-# Logs and temporary files
+# Logs, temporary files, regenerable cache
 *.bak
 *.bak[0-9]*
 *.bkp
@@ -41,16 +41,17 @@ Thumbs.db
 *.swp
 *.tmp
 log/
+.log/
 logs/
+.logs/
 tmp/
+.tmp/
+cache/
+.cache/
 
 # Local environment variables
 .env
 .env.*
-!.env.example
-.envrc
-.envrc.*
-!.envrc.example
 
 # dia:end
 

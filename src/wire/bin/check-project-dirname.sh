@@ -88,7 +88,7 @@ ok=0
 while IFS="" read -r file; do
     [ -n "${file}" ] || continue
 
-    project_dir="$(CDPATH= cd -- "$(dirname "${file}")" && pwd)"
+    project_dir="$(CDPATH='' cd -- "$(dirname "${file}")" && pwd)"
     dirname="$(basename "${project_dir}")"
     name="$(yq -r '.project.name // ""' "${file}")"
 

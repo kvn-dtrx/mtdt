@@ -54,7 +54,7 @@ find "${@}" -type f -iname ".mtdt.yaml" > "${tmp}"
 while IFS="" read -r file; do
     [ -n "${file}" ] || continue
 
-    project_dir="$(CDPATH= cd -- "$(dirname "${file}")" && pwd)"
+    project_dir="$(CDPATH='' cd -- "$(dirname "${file}")" && pwd)"
 
     if [ ! -d "${project_dir}/.git" ] &&
         ! git -C "${project_dir}" rev-parse --git-dir > /dev/null 2>&1; then
@@ -104,7 +104,7 @@ while IFS="" read -r file; do
     fi
 
     err="$(mktemp)"
-    if git -C "${project_dir}" push --dry-run --porcelain "${url}" HEAD > /dev/null 2>"${err}"; then
+    if git -C "${project_dir}" push --dry-run --porcelain "${url}" HEAD > /dev/null 2> "${err}"; then
         printf '%s\n' "OK ${project_dir}"
         ok=$((ok + 1))
     else

@@ -30,7 +30,7 @@ trap 'rm -f "${roots_tmp}" "${list_tmp}"' EXIT
 while [ "$#" -gt 0 ]; do
     case "${1}" in
         --dirname)
-            mode=dirname
+            mode='dirname'
             shift
             ;;
         -h | --help)
@@ -79,7 +79,7 @@ done < "${roots_tmp}"
 while IFS="" read -r file; do
     [ -n "${file}" ] || continue
 
-    project_dir="$(CDPATH= cd -- "$(dirname "${file}")" && pwd)"
+    project_dir="$(CDPATH='' cd -- "$(dirname "${file}")" && pwd)"
     if [ ! -d "${project_dir}/.git" ] &&
         ! git -C "${project_dir}" rev-parse --git-dir > /dev/null 2>&1; then
         continue
@@ -108,7 +108,7 @@ while IFS="" read -r file; do
     fi
 
     github_name="$(
-        CDPATH= cd -- "${project_dir}" &&
+        CDPATH='' cd -- "${project_dir}" &&
             gh repo view --json name -q .name 2> /dev/null || true
     )"
     if [ -z "${github_name}" ]; then
@@ -132,7 +132,7 @@ while IFS="" read -r file; do
     case "${ans}" in
         [Yy]*)
             if ! (
-                CDPATH= cd -- "${project_dir}" &&
+                CDPATH='' cd -- "${project_dir}" &&
                     gh repo rename "${target}" --yes
             ); then
                 printf '%s\n' "Rename failed for ${project_dir}" >&2

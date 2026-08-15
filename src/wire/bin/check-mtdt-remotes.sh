@@ -17,25 +17,21 @@ set -o nounset
 
 script="$(realpath "${0}")"
 script_dir="$(dirname "${script}")"
-repo_logging="$(CDPATH= cd -- "${script_dir}/../logging/libexec" 2> /dev/null && pwd || true)"
+repo_logging="$(CDPATH='' cd -- "${script_dir}/../logging/libexec" 2> /dev/null && pwd || true)"
 
 if [ -n "${repo_logging}" ] && [ -f "${repo_logging}/env.sh" ]; then
     # shellcheck source=/dev/null
     . "${repo_logging}/env.sh"
     case ":${PATH}:" in
         *":${repo_logging}:"*) ;;
-        *) PATH="${repo_logging}:${PATH}"; export PATH ;;
+        *)
+            PATH="${repo_logging}:${PATH}"
+            export PATH
+            ;;
     esac
 elif [ -f "${WIRE_LIBEXEC_SHARED:-${HOME}/.local/libexec/logging}/env.sh" ]; then
     # shellcheck source=/dev/null
     . "${WIRE_LIBEXEC_SHARED:-${HOME}/.local/libexec/logging}/env.sh"
-fi
-
-if ! command -v log-info > /dev/null 2>&1; then
-    log-info() { printf '[INFO]:  %s\n' "${*}"; }
-    log-debug() { printf '[DEBUG]: %s\n' "${*}"; }
-    log-warn() { printf '[WARN]:  %s\n' "${*}" >&2; }
-    log-error() { printf '[ERROR]: %s\n' "${*}" >&2; }
 fi
 
 usage() {
@@ -153,7 +149,7 @@ infer_github_scheme() {
                 esac
                 ;;
         esac
-    done <<EOF
+    done << EOF
 $(git -C "${dir}" config --get-regexp '^url\..*\.insteadof$' 2> /dev/null || true)
 EOF
 
@@ -227,7 +223,7 @@ fixed=0
 
 while IFS="" read -r file; do
     [ -n "${file}" ] || continue
-    project_dir="$(CDPATH= cd -- "$(dirname "${file}")" && pwd)"
+    project_dir="$(CDPATH='' cd -- "$(dirname "${file}")" && pwd)"
     local_file="${project_dir}/.mtdt.local.yaml"
 
     if [ ! -d "${project_dir}/.git" ] &&

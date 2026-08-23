@@ -1,0 +1,133 @@
+#!/usr/bin/env sh
+
+# ---
+# description: >-
+#   Provides the umbrella command for mtdt metadata operations
+# ---
+
+# ---
+
+set -o errexit
+set -o nounset
+
+script="$(realpath "${0}")"
+bin_dir="$(dirname "${script}")"
+
+usage() {
+    cat << 'EOF'
+Usage: mtdt <command> [arguments...]
+
+Query and identity:
+  get                   Read a dotted metadata property
+  resolve               Print base metadata with its local forge overlay
+  project-id            Print the stable project identifier
+  list-projects         List project identifiers and checkout paths
+  derive slug           Derive a repository slug from a project name
+
+Validation and checks:
+  validate              Validate metadata files
+  check remotes         Check origin/upstream against forge metadata
+  check forge-push      Dry-run a push to the effective GitHub forge
+  check dirname         Check checkout directory names
+
+Deployment and updates:
+  init                  Scaffold .mtdt.yaml
+  deploy local          Materialise .mtdt.local.yaml from the fork catalogue
+  deploy license        Materialise the configured license
+  deploy contributing   Materialise CONTRIBUTING.md
+  flush pyproject       Update overlapping pyproject.toml metadata
+  sync remotes          Reconcile origin/upstream with forge metadata
+  update github descriptions
+  update github names
+  update github visibility
+
+Run `mtdt <command> --help` for command-specific options where available.
+Legacy flat commands remain installed as compatibility shims.
+EOF
+}
+
+run() {
+    command_name="${1}"
+    shift
+    exec "${bin_dir}/${command_name}" "$@"
+}
+
+command_name="${1:-help}"
+[ "$#" -eq 0 ] || shift
+
+case "${command_name}" in
+    help | -h | --help)
+        usage
+        ;;
+    get) run mtdt-get.py "$@" ;;
+    resolve) run resolve-mtdt.py "$@" ;;
+    project-id) run mtdt-project-id.py "$@" ;;
+    list-projects) run mtdt-list-projects.py "$@" ;;
+    validate) run validate-mtdt.sh "$@" ;;
+    init) run init-mtdt.sh "$@" ;;
+    derive)
+        subcommand="${1:-}"
+        [ "$#" -eq 0 ] || shift
+        case "${subcommand}" in
+            slug) run derive-project-slug.py "$@" ;;
+            *) printf '%s\n' "Usage: mtdt derive slug [NAME...]" >&2; exit 2 ;;
+        esac
+        ;;
+    check)
+        subcommand="${1:-}"
+        [ "$#" -eq 0 ] || shift
+        case "${subcommand}" in
+            remotes) run check-mtdt-remotes.sh "$@" ;;
+            forge-push) run check-forge-push.sh "$@" ;;
+            dirname) run check-project-dirname.sh "$@" ;;
+            *) printf '%s\n' "Usage: mtdt check {remotes|forge-push|dirname} [arguments...]" >&2; exit 2 ;;
+        esac
+        ;;
+    deploy)
+        subcommand="${1:-}"
+        [ "$#" -eq 0 ] || shift
+        case "${subcommand}" in
+            local) run deploy-mtdt-local.py "$@" ;;
+            license) run deploy-license.sh "$@" ;;
+            contributing) run deploy-contributing.sh "$@" ;;
+            *) printf '%s\n' "Usage: mtdt deploy {local|license|contributing} [arguments...]" >&2; exit 2 ;;
+        esac
+        ;;
+    flush)
+        subcommand="${1:-}"
+        [ "$#" -eq 0 ] || shift
+        case "${subcommand}" in
+            pyproject) run flush-pyproject.py "$@" ;;
+            *) printf '%s\n' "Usage: mtdt flush pyproject [arguments...]" >&2; exit 2 ;;
+        esac
+        ;;
+    sync)
+        subcommand="${1:-}"
+        [ "$#" -eq 0 ] || shift
+        case "${subcommand}" in
+            remotes) run check-mtdt-remotes.sh --fix "$@" ;;
+            *) printf '%s\n' "Usage: mtdt sync remotes [arguments...]" >&2; exit 2 ;;
+        esac
+        ;;
+    update)
+        host="${1:-}"
+        [ "$#" -eq 0 ] || shift
+        subject="${1:-}"
+        [ "$#" -eq 0 ] || shift
+        if [ "${host}" != "github" ]; then
+            printf '%s\n' "Usage: mtdt update github {descriptions|names|visibility} [arguments...]" >&2
+            exit 2
+        fi
+        case "${subject}" in
+            descriptions) run update-gh-repo-descriptions.sh "$@" ;;
+            names) run update-gh-repo-names.sh "$@" ;;
+            visibility) run update-gh-repo-visibility.sh "$@" ;;
+            *) printf '%s\n' "Usage: mtdt update github {descriptions|names|visibility} [arguments...]" >&2; exit 2 ;;
+        esac
+        ;;
+    *)
+        printf '%s\n' "Unknown mtdt command: ${command_name}" >&2
+        usage >&2
+        exit 2
+        ;;
+esac

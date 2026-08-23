@@ -1,0 +1,15 @@
+# ---
+# title: example mtdt fork overlays (public template)
+# ---
+
+# Install the private catalogue as ~/.config/mtdt/forks.yaml and replace the
+# example UUID. Do not commit personal fork URLs to this public repository.
+
+# ---
+
+forks:
+  00000000-0000-0000-0000-000000000000:
+    # Example Project
+    github:
+      url: https://github.com/example/example-fork
+      visibility: private

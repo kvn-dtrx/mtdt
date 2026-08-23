@@ -9,10 +9,9 @@
 
 # ---
 
-from __future__ import annotations
 
 import argparse
-import copy
+import os
 import sys
 from pathlib import Path
 
@@ -22,27 +21,15 @@ except ImportError as exc:  # pragma: no cover
     sys.stderr.write("resolve-mtdt requires PyYAML\n")
     raise SystemExit(1) from exc
 
-LOCAL_NAME = ".mtdt.local.yaml"
+_WIRE_LIB_RAW = os.environ.get("WIRE_LIB", "").strip()
+_LIB = (
+    Path(_WIRE_LIB_RAW).expanduser()
+    if _WIRE_LIB_RAW
+    else Path(__file__).resolve().parents[1] / "lib"
+)
+sys.path.insert(0, str(_LIB))
 
-
-def _merge_forges(base: object, overlay: object) -> dict:
-    if not isinstance(base, dict):
-        base = {}
-    if not isinstance(overlay, dict):
-        return copy.deepcopy(base)
-    out: dict = copy.deepcopy(base)
-    for host, entry in overlay.items():
-        if not isinstance(entry, dict):
-            out[host] = copy.deepcopy(entry)
-            continue
-        cur = out.get(host)
-        if isinstance(cur, dict):
-            merged = copy.deepcopy(cur)
-            merged.update(entry)
-            out[host] = merged
-        else:
-            out[host] = copy.deepcopy(entry)
-    return out
+from mtdt_metadata import LOCAL_BASENAME, load_metadata  # noqa: E402
 
 
 def resolve(base_path: Path) -> tuple[dict | None, str | None]:
@@ -50,31 +37,10 @@ def resolve(base_path: Path) -> tuple[dict | None, str | None]:
     if not base_path.is_file():
         raise FileNotFoundError(base_path)
     raw = base_path.read_text(encoding="utf-8")
-    local_path = base_path.parent / LOCAL_NAME
+    local_path = base_path.parent / LOCAL_BASENAME
     if not local_path.is_file():
         return None, raw
-
-    base = yaml.safe_load(raw)
-    if not isinstance(base, dict):
-        raise ValueError(f"{base_path}: root must be a mapping")
-
-    local = yaml.safe_load(local_path.read_text(encoding="utf-8"))
-    if local is None:
-        local = {}
-    if not isinstance(local, dict):
-        raise ValueError(f"{local_path}: root must be a mapping")
-
-    unexpected = sorted(k for k in local if k != "forges")
-    if unexpected:
-        raise ValueError(
-            f"{local_path}: only top-level forges: allowed "
-            f"(found: {', '.join(unexpected)})"
-        )
-
-    if "forges" in local:
-        base = copy.deepcopy(base)
-        base["forges"] = _merge_forges(base.get("forges"), local.get("forges"))
-    return base, None
+    return load_metadata(base_path, effective=True), None
 
 
 def main(argv: list[str] | None = None) -> int:

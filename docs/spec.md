@@ -1,4 +1,5 @@
 # ---
+
 title: .mtdt.yaml specification
 created: 2025-08-31
 ---
@@ -13,12 +14,12 @@ project identity, licensing, and **canonical** forge settings — written from t
 and sync forge settings from it.
 
 Clone-specific forge overlays (typical: a personal fork URL) are **not**
-versioned in the project repo. They are catalogued centrally in private
-meta-project-annex (`src/mtdt/forks.yaml`, keyed by `project.id`) and
-materialised as `.mtdt.local.yaml` by meta-project's `deploy-mtdt-local`.
-`resolve-mtdt` merges that overlay (forges only). Env secret *pointers* live
-in the same annex (`src/mtdt/env-plans.yaml` → meta `deploy-env-plans`);
-values stay in krypta / XDG phrase files.
+versioned in the project repo. `deploy-mtdt-local` materialises them from the
+private `${XDG_CONFIG_HOME:-~/.config}/mtdt/forks.yaml` catalogue, keyed by
+`project.id`. `resolve-mtdt` merges that overlay (forges only).
+
+Environment plans may also use `project.id` as a foreign key, but they are not
+part of this specification and remain owned by meta-project.
 
 It is intentionally separate from snippet embedding (dia).
 
@@ -45,21 +46,20 @@ legacy `project.github` and `subtrees`.
 Same directory as `.mtdt.yaml`. **Only** top-level `forges:` is allowed; entries
 deep-merge over the base (local host fields win). Ignore the file in git.
 
-Source of truth for known forks: private meta-project-annex
-`src/mtdt/forks.yaml` → meta `deploy-mtdt-local` (env `MTDT_FORKS_FILE` /
-`META_PROJECT_ANNEX` / `META_PROJECT`). Env plans: annex
-`src/mtdt/env-plans.yaml` → `deploy-env-plans` (`MTDT_ENV_PLANS_FILE`).
+Source of truth for known forks: private XDG catalogue
+`~/.config/mtdt/forks.yaml` → `deploy-mtdt-local`. `MTDT_FORKS_FILE` may
+override the path.
 
 | Consumer | Uses |
 | --- | --- |
 | `deploy-license`, `deploy-contributing`, `flush-pyproject`, dirname checks | base `.mtdt.yaml` only |
 | `validate-mtdt` (forge warnings), `check-forge-push`, `update-gh-repo-visibility`, `check-mtdt-remotes` | effective / split base↔local as documented per tool |
-| meta `deploy-mtdt-local` | annex forks catalog → working-tree `.mtdt.local.yaml` |
-| meta `deploy-env-plans` | annex env-plans catalog → checkout `.env` keys (values via `retrieve-envvar`) |
+| `deploy-mtdt-local` | private fork catalogue → working-tree `.mtdt.local.yaml` |
+| external consumers | use `mtdt-get`, `mtdt-project-id`, or `mtdt-list-projects` instead of parsing the schema |
 
 `split-mtdt-forks` detects GitHub forks and moves the fork URL into local while
 pointing the base `forges.github.url` at the upstream parent (also add the
-entry to meta-project `forks.yaml`).
+entry to the private mtdt fork catalogue).
 
 `check-mtdt-remotes` checks that split against git remotes (exit 1 on drift);
 `--fix` applies `git remote add` / `set-url` / `remove`. Identity compares
@@ -114,7 +114,7 @@ Algorithm (normative):
 2. If the name ends with `.github.io` (case-insensitive), remember that suffix
    and strip it for the following steps (GitHub Pages repos keep the literal
    suffix on the directory).
-3. Replace every `: ` (colon + space) with `_` — e.g. `DA Project: Artsy` →
+3. Replace every `:<space>` with `_` — e.g. `DA Project: Artsy` →
    directory `da-project_artsy`.
 4. Replace `.` between two lowercase letters with `-` (e.g. `Reveal.js` →
    `Reveal-js`).

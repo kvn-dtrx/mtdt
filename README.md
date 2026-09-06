@@ -11,7 +11,7 @@ This repository does **not** embed shared config snippets (that is dia).
 
 ## Layout
 
-```
+``` text
 config/wire.ini           install mounts only (no host map)
 docs/spec.md              normative schema
 docs/example.mtdt.yaml    commented filled example (generic placeholders)
@@ -48,6 +48,7 @@ mtdt check remotes path/to/project
 mtdt sync remotes path/to/project
 mtdt deploy license path/to/project
 mtdt update github visibility ~/data/projects
+mtdt update gitlab visibility ~/data/projects
 ```
 
 Run `mtdt help` for the complete command map. The former flat commands remain installed as compatibility shims for scripts and existing muscle memory.
@@ -59,6 +60,9 @@ Run `mtdt help` for the complete command map. The former flat commands remain in
 | `update-gh-repo-descriptions` | Push `project.description` via `gh repo edit` |
 | `update-gh-repo-visibility` | Push `forges.github.visibility` |
 | `update-gh-repo-names` | Prompt to rename GitHub toward mtdt slug (`derive-project-slug(name)`); `--dirname` = legacy |
+| `update-glab-repo-descriptions` | Push `project.description` to the derived GitLab project |
+| `update-glab-repo-visibility` | Push effective GitLab/GitHub visibility via `glab api` |
+| `update-glab-repo-names` | Prompt to rename GitLab toward `derive-project-slug(project.name)`; `--yes` skips prompts |
 | `derive-project-slug` | Print local directory slug derived from `project.name` (stdin/args) |
 | `check-project-dirname` | Report dirname ↔ slug divergences; optional `--fix` renames (blocks if destination exists) |
 | `check-forge-push` | `git push --dry-run` HEAD to effective `forges.github.url` (needs network + creds) |
@@ -107,6 +111,17 @@ Collections in raw mode exit 2 and require `--format json` or `--format yaml`.
 `mtdt-project-id` remains the semantic convenience command for consumers that
 specifically require an identity and uses the same shared query implementation.
 
+### GitLab updates
+
+The GitLab update commands target effective `forges.gitlab.url` when it is
+set. Otherwise they derive the project from effective `forges.github.url` by
+preserving its namespace and repository path on `gitlab.com`. Consequently a
+`.mtdt.local.yaml` GitHub fork overlay takes precedence automatically.
+
+For visibility, effective `forges.gitlab.visibility` takes precedence when
+present; otherwise `forges.github.visibility` is reused. Names are derived
+from `project.name`, just like the GitHub name updater.
+
 Local dirname ↔ `project.name` rules are normative in [`docs/spec.md`](docs/spec.md)
 (no stored `project.slug`; forge slug only via `forges.*.url`).
 
@@ -120,8 +135,11 @@ Local dirname ↔ `project.name` rules are normative in [`docs/spec.md`](docs/sp
 
 - `yq` (YAML queries)
 - `gh` (GitHub CLI) for the `update-gh-*` scripts
+- optional `my-gh` credential broker: `mtdt update github …` obtains one
+  administrative authorization for the complete batch
+- `glab` (GitLab CLI) for the `update-glab-*` scripts
 - POSIX `sh`
-- Python ≥3.11 (stdlib only for `derive-project-slug`; `PyYAML` + `tomlkit` for `flush-pyproject`)
+- Python ≥3.11 (`PyYAML` for metadata/GitLab updates; `tomlkit` for `flush-pyproject`)
 
 ## Origin notes
 

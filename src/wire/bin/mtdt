@@ -40,6 +40,9 @@ Deployment and updates:
   update github descriptions
   update github names
   update github visibility
+  update gitlab descriptions
+  update gitlab names
+  update gitlab visibility
 
 Run `mtdt <command> --help` for command-specific options where available.
 Legacy flat commands remain installed as compatibility shims.
@@ -50,6 +53,19 @@ run() {
     command_name="${1}"
     shift
     exec "${bin_dir}/${command_name}" "$@"
+}
+
+run_github_update() {
+    command_name="${1}"
+    shift
+
+    if [ "${MY_GH_ADMIN_ACTIVE:-}" != "1" ] &&
+        command -v my-gh > /dev/null 2>&1; then
+        exec my-gh admin-exec \
+            "${script}" update github "${subject}" "$@"
+    fi
+
+    run "${command_name}" "$@"
 }
 
 command_name="${1:-help}"
@@ -114,15 +130,27 @@ case "${command_name}" in
         [ "$#" -eq 0 ] || shift
         subject="${1:-}"
         [ "$#" -eq 0 ] || shift
-        if [ "${host}" != "github" ]; then
-            printf '%s\n' "Usage: mtdt update github {descriptions|names|visibility} [arguments...]" >&2
-            exit 2
-        fi
-        case "${subject}" in
-            descriptions) run update-gh-repo-descriptions.sh "$@" ;;
-            names) run update-gh-repo-names.sh "$@" ;;
-            visibility) run update-gh-repo-visibility.sh "$@" ;;
-            *) printf '%s\n' "Usage: mtdt update github {descriptions|names|visibility} [arguments...]" >&2; exit 2 ;;
+        case "${host}" in
+            github)
+                case "${subject}" in
+                    descriptions) run_github_update update-gh-repo-descriptions.sh "$@" ;;
+                    names) run_github_update update-gh-repo-names.sh "$@" ;;
+                    visibility) run_github_update update-gh-repo-visibility.sh "$@" ;;
+                    *) printf '%s\n' "Usage: mtdt update github {descriptions|names|visibility} [arguments...]" >&2; exit 2 ;;
+                esac
+                ;;
+            gitlab)
+                case "${subject}" in
+                    descriptions) run update-glab-repo-descriptions.sh "$@" ;;
+                    names) run update-glab-repo-names.sh "$@" ;;
+                    visibility) run update-glab-repo-visibility.sh "$@" ;;
+                    *) printf '%s\n' "Usage: mtdt update gitlab {descriptions|names|visibility} [arguments...]" >&2; exit 2 ;;
+                esac
+                ;;
+            *)
+                printf '%s\n' "Usage: mtdt update {github|gitlab} {descriptions|names|visibility} [arguments...]" >&2
+                exit 2
+                ;;
         esac
         ;;
     *)

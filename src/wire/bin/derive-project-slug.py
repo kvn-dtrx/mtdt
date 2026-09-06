@@ -8,43 +8,21 @@
 
 # ---
 
-from __future__ import annotations
 
 import argparse
-import re
+import os
 import sys
+from pathlib import Path
 
-_GITHUB_IO = ".github.io"
+_WIRE_LIB_RAW = os.environ.get("WIRE_LIB", "").strip()
+_LIB = (
+    Path(_WIRE_LIB_RAW).expanduser()
+    if _WIRE_LIB_RAW
+    else Path(__file__).resolve().parents[1] / "lib"
+)
+sys.path.insert(0, str(_LIB))
 
-
-def project_slug(name: str) -> str:
-    """Derive local directory slug from project.name (see docs/spec.md)."""
-    s = name.strip()
-    if not s:
-        return ""
-
-    github_io = s.lower().endswith(_GITHUB_IO)
-    if github_io:
-        s = s[: -len(_GITHUB_IO)]
-
-    # Title subtitle split used in several archived project names
-    s = s.replace(": ", "_")
-
-    # product.suffix (e.g. Reveal.js) → product-suffix; keep abbreviation dots for strip
-    s = re.sub(r"(?<=[a-z])\.(?=[a-z])", "-", s)
-
-    # Remaining dots (B.Sc., …) drop — not directory separators
-    s = s.replace(".", "")
-
-    s = re.sub(r"\s+", "-", s)
-    s = re.sub(r"[^a-zA-Z0-9_-]+", "", s)
-    s = s.lower()
-    s = re.sub(r"-{2,}", "-", s)
-    s = re.sub(r"^[-_]+|[-_]+$", "", s)
-
-    if github_io:
-        s = f"{s}{_GITHUB_IO}"
-    return s
+from mtdt_slug import project_slug  # noqa: E402
 
 
 def main(argv: list[str] | None = None) -> int:

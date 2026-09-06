@@ -1,5 +1,4 @@
-# ---
-
+---
 title: .mtdt.yaml specification
 created: 2025-08-31
 ---
@@ -53,7 +52,7 @@ override the path.
 | Consumer | Uses |
 | --- | --- |
 | `deploy-license`, `deploy-contributing`, `flush-pyproject`, dirname checks | base `.mtdt.yaml` only |
-| `validate-mtdt` (forge warnings), `check-forge-push`, `update-gh-repo-visibility`, `check-mtdt-remotes` | effective / split base↔local as documented per tool |
+| `validate-mtdt` (forge warnings), `check-forge-push`, forge update scripts, `check-mtdt-remotes` | effective / split base↔local as documented per tool |
 | `deploy-mtdt-local` | private fork catalogue → working-tree `.mtdt.local.yaml` |
 | external consumers | use `mtdt-get`, `mtdt-project-id`, or `mtdt-list-projects` instead of parsing the schema |
 
@@ -148,8 +147,12 @@ individually; omit a host if unused. Entry field order: `url` → `visibility`.
 | `url` | string \| null | Canonical repo URL on that host |
 | `visibility` | `public` \| `private` \| `internal` \| null | Forge visibility; `null` skips sync |
 
-Current sync scripts read `forges.github` only (`gh`). Additional hosts are
-schema-valid for declaration; tooling may ignore them until implemented.
+GitHub update scripts read `forges.github` through `gh`. When the `my-gh`
+credential broker is installed, `mtdt update github …` runs the complete batch
+through one `my-gh admin-exec` authorization; direct `gh` authentication
+remains the portable fallback. GitLab update scripts prefer effective
+`forges.gitlab`; when absent, they derive the GitLab target from effective
+`forges.github` and use `glab`.
 
 # Relation to `pyproject.toml`
 

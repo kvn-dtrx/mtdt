@@ -9,12 +9,12 @@
 # --- Base ---
 
 # macOS
-._*
 .AppleDouble
 .DS_Store
 .LSOverride
 .Spotlight-V100
 .Trashes
+._*
 * [0-9]
 * [0-9].*
 * copy
@@ -36,22 +36,46 @@ Thumbs.db
 *.bak
 *.bak[0-9]*
 *.bkp
+*.cache
 *.log
+*.old
+*.swn
+*.swns
 *.swo
 *.swp
 *.tmp
+*.tmp.*
+*_tmp.*
+build/
+cache/
+.cache/
 log/
 .log/
 logs/
 .logs/
 tmp/
 .tmp/
-cache/
-.cache/
+
+# Local mountpoints
+mnt/
+mount/
+mounts/
+
+# Scripting-language artefacts
+*.py[cod]
+*.rbc
+.ruby-lsp/
+__pycache__/
 
 # Local environment variables
 .env
 .env.*
+env/
+env.bak/
+
+# Local configuration overrides
+*.local
+*.local.*
 
 # dia:end
 
@@ -62,12 +86,29 @@ cache/
 
 # --- Python ---
 
-__pycache__/
+# Packages and bytecode
 *.egg-info/
 *.pyc
 *.pyi
+__pycache__/
+
+# Local configuration
 /.python-version
-/.venv/
 local_settings.py
+
+# Linter artefacts
+.ruff_cache/
+
+# Type-checker artefacts
+.dmypy.json
+.mypy_cache/
+dmypy.json
+
+# Virtual environments
+.venv/
+env/
+env.bak/
+venv/
+venv.bak/
 
 # dia:end
